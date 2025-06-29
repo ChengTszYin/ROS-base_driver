@@ -1,0 +1,19 @@
+ <launch>
+
+    <node name="base_driver_node" pkg="base_driver" type="base_driver_node" output="screen">
+        <rosparam file="$(find stm_driver)/param/config.yaml" command="load" />
+        <param name="ser_port" value="/dev/ttyUSB0"/>
+    </node>
+
+    <node pkg="gy95T_driver" type="gy95_v2.py" name="imu_publisher" output="screen">
+        <param name="ser_port" value="/dev/ttyUSB1"/>
+    </node>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="imu_to_base"
+        args="0.0 0.0 0.0 0.0 0.0 0.0 base_link imu_link" />
+
+    <include file="$(find ydlidar_ros_driver)/launch/X3.launch" />
+    
+    <node pkg="tf2_ros" type="static_transform_publisher" name="laser_to_base"
+        args="0.0 0.0 0.0 0.0 0.0 0.0 base_link laser" />
+ </launch>
