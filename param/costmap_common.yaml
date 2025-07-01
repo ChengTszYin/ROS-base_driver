@@ -8,6 +8,8 @@ transform_tolerance: 0.2
 
 resolution: 0.05
 
+cost_scaling_factor: 10.0
+
 #layer definitions
 static:
     map_topic: /map
