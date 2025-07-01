@@ -64,7 +64,7 @@ DWAPlannerROS:
 
   max_vel_trans: 0.5 # don't modify this currently
   min_vel_trans: 0.1 # don't modify this currently
-  max_vel_theta: 1.0  # don't modify this currently
+  max_vel_theta: 2.0  # don't modify this currently
   min_vel_theta: 0.05 # don't modify this currently
 
   # Goal Tolerance Parameters
