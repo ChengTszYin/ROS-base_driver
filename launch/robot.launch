@@ -1,7 +1,7 @@
  <launch>
 
     <node name="base_driver_node" pkg="base_driver" type="base_driver_node" output="screen">
-        <rosparam file="$(find stm_driver)/param/config.yaml" command="load" />
+        <rosparam file="$(find base_driver)/param/config.yaml" command="load" />
         <param name="ser_port" value="/dev/ttyUSB0"/>
     </node>
 
@@ -16,4 +16,16 @@
     
     <node pkg="tf2_ros" type="static_transform_publisher" name="laser_to_base"
         args="0.0 0.0 0.0 0.0 0.0 0.0 base_link laser" />
+    
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch" />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="camera_to_base"
+        args="0.0 0.0 0.1 0.0 0.0 0.0 base_link camera_link" />
+
+    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" 		name="depthimage_to_laserscan">
+        <remap from="image" to="/camera/aligned_depth_to_color/image_raw" />
+        <param name="output_frame_id" value="camera_link"  />
+        <remap from="/scan" to="/camera/scan"/>
+  </node>
+  
  </launch>

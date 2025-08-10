@@ -270,8 +270,8 @@ void handle_speed(const recvMessage& recv, tf::TransformBroadcaster& broadcaster
 
     // Publish transform
     geometry_msgs::TransformStamped t;
-    t.header.frame_id = "/odom";
-    t.child_frame_id = "/base_link";
+    t.header.frame_id = "odom";
+    t.child_frame_id = "base_link";
     t.transform.translation.x = x_pos;
     t.transform.translation.y = y_pos;
     t.transform.translation.z = 0.0;
@@ -282,7 +282,7 @@ void handle_speed(const recvMessage& recv, tf::TransformBroadcaster& broadcaster
     // Publish odometry
     nav_msgs::Odometry odom_msg;
     odom_msg.header.stamp = speed_time;
-    odom_msg.header.frame_id = "/odom";
+    odom_msg.header.frame_id = "odom";
     odom_msg.pose.pose.position.x = x_pos;
     odom_msg.pose.pose.position.y = y_pos;
     odom_msg.pose.pose.position.z = 0.0;
@@ -320,7 +320,7 @@ void handle_speed(const recvMessage& recv, tf::TransformBroadcaster& broadcaster
     }
     double vx = (dt == 0) ? 0 : (speed_act_left + speed_act_right) / 2;
     double vth = (dt == 0) ? 0 : (speed_act_right - speed_act_left) / Track;
-    odom_msg.child_frame_id = "/base_link";
+    odom_msg.child_frame_id = "base_link";
     odom_msg.twist.twist.linear.x = vx;
     odom_msg.twist.twist.linear.y = 0.0;
     odom_msg.twist.twist.angular.z = dth;

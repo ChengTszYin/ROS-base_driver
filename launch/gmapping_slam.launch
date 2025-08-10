@@ -3,14 +3,21 @@
         <param name="base_frame" value="base_link"/>
         <param name="odom_frame" value="odom"/>
         <param name="map_update_interval" value="1.0"/>
-        <param name="maxUrange" value="12.0"/>
+        <param name="maxUrange" value="15.0"/>
         <param name="xmin" value="-50.0"/>
         <param name="ymin" value="-50.0"/>
         <param name="xmax" value="50.0"/>
         <param name="ymax" value="50.0"/>
         <param name="linearUpdate" value="0.2"/> <!-- 减少线性更新阈值 -->
         <param name="angularUpdate" value="0.1745"/> <!-- 减少角更新阈值，约10度 -->
+        <param name="particles" value="100"/> <!-- More particles for robustness -->
+        <param name="srr" value="0.1"/> <!-- Translational noise -->
+        <param name="stt" value="0.1"/> <!-- Rotational noise -->
+        <param name="srt" value="0.2"/> <!-- Cross noise -->
+        <param name="minimumScore" value="30"/> <!-- Filter low-likelihood matches -->
+        <param name="temporalUpdate" value="-1.0"/> <!-- Disable time-based updates -->
         <remap from="scan" to="/scan"/>
     </node>
+
 </launch>
 

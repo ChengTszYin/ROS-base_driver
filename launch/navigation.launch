@@ -1,7 +1,7 @@
 <launch>
     <param name="use_sim_time" value="false" />
 
-    <arg name="map" default="/home/dllm/maps/myhome/myhome.yaml" />
+    <arg name="map" default="/home/dllm/carto_ws/src/cartographer_ros/map/20250726_23-41-27/20250726_23-41-27.yaml" />
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)"/>
 
     <node pkg="jie_ware" type="lidar_loc" name="lidar_loc" >
@@ -10,6 +10,10 @@
         <param name="laser_frame" value="laser" />
         <param name="laser_topic" value="scan" />
     </node>
+
+   
+    
+    <!-- <include file="$(find orb_slam2_ros)/ros/launch/orb_slam2_d435_rgbd.launch" /> -->
     
     <!-- <node pkg="amcl" type="amcl" name="amcl" output="screen">
         <param name="odom_frame_id" value="odom"/>
