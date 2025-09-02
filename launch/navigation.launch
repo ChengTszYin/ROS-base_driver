@@ -1,7 +1,7 @@
 <launch>
     <param name="use_sim_time" value="false" />
 
-    <arg name="map" default="/home/dllm/carto_ws/src/cartographer_ros/map/20250726_23-41-27/20250726_23-41-27.yaml" />
+    <arg name="map" default="/home/dllm/maps/myhome3/myhome.yaml" />
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)"/>
 
     <node pkg="jie_ware" type="lidar_loc" name="lidar_loc" >
@@ -11,26 +11,16 @@
         <param name="laser_topic" value="scan" />
     </node>
 
-   
+   <node pkg="move_base" type="move_base" name="move_base">
+        <rosparam file="$(find base_driver)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find base_driver)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find base_driver)/params/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find base_driver)/params/local_costmap_params.yaml" command="load" />
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" /> 
+        <param name="base_local_planner" value="agv_planner/AgvPlanner" />
+  </node>
     
     <!-- <include file="$(find orb_slam2_ros)/ros/launch/orb_slam2_d435_rgbd.launch" /> -->
-    
-    <!-- <node pkg="amcl" type="amcl" name="amcl" output="screen">
-        <param name="odom_frame_id" value="odom"/>
-        <param name="base_frame_id" value="base_link"/>
-        <param name="global_frame_id" value="map"/>
-        <param name="update_min_d" value="0.05"/>
-        <param name="update_min_a" value="0.05"/> 
-        <param name="min_particles" value="500"/> 
-        <param name="max_particles" value="1000"/> 
-        <param name="transform_tolerance" value="1.0"/> 
-        <param name="laser_model_type" value="likelihood_field"/> 
-        <param name="laser_max_beams" value="60"/> 
-        <param name="laser_z_hit" value="0.5"/>
-        <param name="laser_z_rand" value="0.5"/> 
-        <param name="resample_interval" value="1.0"/> 
-        <param name="recovery_alpha_slow" value="0.001"/> 
-        <param name="recovery_alpha_fast" value="0.1"/> 
-    </node>  -->
+
 
 </launch>
