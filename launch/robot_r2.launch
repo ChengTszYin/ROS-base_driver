@@ -1,0 +1,14 @@
+ <launch>
+    
+    <node pkg="tf2_ros" type="static_transform_publisher" name="laser_to_base"
+        args="0.0 0.0 0.0 0.0 0.0 0.0 base_link laser" />
+    
+    <!-- <include file="$(find xqserial_server)/launch/xqserial.launch" /> -->
+    <node name="base_driver_node_r2" pkg="base_driver" type="base_driver_node_r2" output="screen">
+        <rosparam file="$(find base_driver)/params/config.yaml" command="load" />
+        <param name="ser_port" value="/dev/ttyUSB0"/>
+    </node>
+
+    <include file="$(find rplidar_ros)/launch/rplidar_c1.launch" />
+  
+ </launch>

@@ -156,6 +156,11 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
+add_executable(${PROJECT_NAME}_node_r2 src/base_driver_node_r2.cpp)
+target_link_libraries(${PROJECT_NAME}_node_r2
+  ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############

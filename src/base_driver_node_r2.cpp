@@ -21,8 +21,8 @@ double speed_req = 0;
 double angular_speed_req = 0;
 double speed_req_left = 0;
 double speed_req_right = 0;
-double l_rpm = 0;
-double r_rpm = 0;
+int l_rpm = 0;
+int r_rpm = 0;
 string port = "/dev/ttyUSB0";
 double fakewheelDia = 0.1007;
 double fakewheelBase = 0.240;
@@ -30,10 +30,12 @@ double fakeTrack = 0.280;
 double wheelDia = 0.01007 / 2;
 double wheelBase = 0.240;
 double Track = 0.280;
-double speed_act_upper_left = 0.0;
-double speed_act_upper_right = 0.0;
-double speed_act_lower_left = 0.0;
-double speed_act_lower_right = 0.0;
+double speed_id_1 = 0.0;
+double speed_id_2 = 0.0;
+double speed_id_3 = 0.0;
+double speed_id_4 = 0.0;
+double speed_id_5 = 0.0;
+double speed_id_6 = 0.0;
 double speed_act_left = 0.0;
 double speed_act_right = 0.0;
 double speed_dt = 0.0;
@@ -46,26 +48,20 @@ ros::Time current_time;
 ros::Time speed_time(0.0);
 
 // Structures from serialstm.h
-struct Hostmessage {
-    uint8_t HleftID = 0x01;
-    int16_t Hleftspeed = 0;
-    uint8_t HrightID = 0x02;
-    int16_t Hrightspeed = 0;
-    uint8_t LleftID = 0x03;
-    int16_t Lleftspeed = 0;
-    uint8_t LrightID = 0x04;
-    int16_t Lrightspeed = 0;
+
+struct m_wheel
+{
+    uint8_t ID = 0x01;
+    int16_t speed = 0;
 };
 
+struct Hostmessage {
+   m_wheel hm[6];
+};
+
+
 struct recvMessage {
-    uint8_t HleftID;
-    int16_t Hleftspeed;
-    uint8_t HrightID;
-    int16_t Hrightspeed;
-    uint8_t LleftID;
-    int16_t Lleftspeed;
-    uint8_t LrightID;
-    int16_t Lrightspeed;
+    m_wheel rm[6];
     int16_t acc_x;
     int16_t acc_y;
     int16_t acc_z;
@@ -139,30 +135,34 @@ public:
             cout << "serial port is not opened" << endl;
             return;
         }
-        recvmsg->HleftID = bufferArray[1];
-        recvmsg->Hleftspeed = (int16_t)((bufferArray[2] << 8) | (bufferArray[3] & 0xFF));
-        recvmsg->HrightID = bufferArray[4] & 0xFF;
-        recvmsg->Hrightspeed = (int16_t)((bufferArray[5] << 8) | (bufferArray[6] & 0xFF));
-        recvmsg->LleftID = bufferArray[7];
-        recvmsg->Lleftspeed = (int16_t)((bufferArray[8] << 8) | (bufferArray[9] & 0xFF));
-        recvmsg->LrightID = bufferArray[10] & 0xFF;
-        recvmsg->Lrightspeed = (int16_t)((bufferArray[11] << 8) | (bufferArray[12] & 0xFF));
-        recvmsg->acc_x = ((bufferArray[13] << 8) & 0xFF) | (bufferArray[14] & 0xFF);
-        recvmsg->acc_y = ((bufferArray[15] << 8) & 0xFF) | (bufferArray[16] & 0xFF);
-        recvmsg->acc_z = ((bufferArray[17] << 8) & 0xFF) | (bufferArray[18] & 0xFF);
-        recvmsg->gyro_x = ((bufferArray[19] << 8) & 0xFF) | (bufferArray[20] & 0xFF);
-        recvmsg->gyro_y = ((bufferArray[21] << 8) & 0xFF) | (bufferArray[22] & 0xFF);
-        recvmsg->gyro_z = ((bufferArray[23] << 8) & 0xFF) | (bufferArray[24] & 0xFF);
-        recvmsg->Q0 = ((bufferArray[25] << 8) & 0xFF) | (bufferArray[26] & 0xFF);
-        recvmsg->Q1 = ((bufferArray[27] << 8) & 0xFF) | (bufferArray[28] & 0xFF);
-        recvmsg->Q2 = ((bufferArray[29] << 8) & 0xFF) | (bufferArray[30] & 0xFF);
-        recvmsg->Q3 = ((bufferArray[31] << 8) & 0xFF) | (bufferArray[32] & 0xFF);
-        recvmsg->sensor1 = ((bufferArray[33] << 8) & 0xFF) | (bufferArray[34] & 0xFF);
-        recvmsg->sensor2 = ((bufferArray[35] << 8) & 0xFF) | (bufferArray[36] & 0xFF);
-        recvmsg->d80nk1 = (bufferArray[37]);
-        recvmsg->d80nk2 = (bufferArray[38]);
-        recvmsg->d80nk3 = (bufferArray[39]);
-        recvmsg->d80nk4 = (bufferArray[40]);
+        recvmsg->rm[0].ID = bufferArray[1];
+        recvmsg->rm[0].speed = (int16_t)((bufferArray[2] << 8) | (bufferArray[3] & 0xFF));
+        recvmsg->rm[1].ID = bufferArray[4] & 0xFF;
+        recvmsg->rm[1].speed = (int16_t)((bufferArray[5] << 8) | (bufferArray[6] & 0xFF));
+        recvmsg->rm[2].ID = bufferArray[7];
+        recvmsg->rm[2].speed = (int16_t)((bufferArray[8] << 8) | (bufferArray[9] & 0xFF));
+        recvmsg->rm[3].ID = bufferArray[10] & 0xFF;
+        recvmsg->rm[3].speed = (int16_t)((bufferArray[11] << 8) | (bufferArray[12] & 0xFF));
+        recvmsg->rm[4].ID = bufferArray[13] & 0xFF;
+        recvmsg->rm[4].speed = (int16_t)((bufferArray[14] << 8) | (bufferArray[15] & 0xFF));
+        recvmsg->rm[5].ID = bufferArray[16] & 0xFF;
+        recvmsg->rm[5].speed = (int16_t)((bufferArray[17] << 8) | (bufferArray[18] & 0xFF));
+        recvmsg->acc_x = ((bufferArray[19] << 8) & 0xFF) | (bufferArray[20] & 0xFF);
+        recvmsg->acc_y = ((bufferArray[21] << 8) & 0xFF) | (bufferArray[22] & 0xFF);
+        recvmsg->acc_z = ((bufferArray[23] << 8) & 0xFF) | (bufferArray[24] & 0xFF);
+        recvmsg->gyro_x = ((bufferArray[25] << 8) & 0xFF) | (bufferArray[26] & 0xFF);
+        recvmsg->gyro_y = ((bufferArray[27] << 8) & 0xFF) | (bufferArray[28] & 0xFF);
+        recvmsg->gyro_z = ((bufferArray[29] << 8) & 0xFF) | (bufferArray[30] & 0xFF);
+        recvmsg->Q0 = ((bufferArray[31] << 8) & 0xFF) | (bufferArray[32] & 0xFF);
+        recvmsg->Q1 = ((bufferArray[33] << 8) & 0xFF) | (bufferArray[34] & 0xFF);
+        recvmsg->Q2 = ((bufferArray[35] << 8) & 0xFF) | (bufferArray[36] & 0xFF);
+        recvmsg->Q3 = ((bufferArray[37] << 8) & 0xFF) | (bufferArray[38] & 0xFF);
+        recvmsg->sensor1 = ((bufferArray[39] << 8) & 0xFF) | (bufferArray[40] & 0xFF);
+        recvmsg->sensor2 = ((bufferArray[41] << 8) & 0xFF) | (bufferArray[42] & 0xFF);
+        recvmsg->d80nk1 = (bufferArray[43]);
+        recvmsg->d80nk2 = (bufferArray[44]);
+        recvmsg->d80nk3 = (bufferArray[45]);
+        recvmsg->d80nk4 = (bufferArray[46]);
     }
 
     void IMUPublish(recvMessage* recvmsg) {
@@ -196,27 +196,42 @@ public:
     }
 
     void putSpeed(Hostmessage* hostmsg) {
-        if (!ser.isOpen()) {
-            cout << "serial port is not opened" << endl;
-            return;
-        }
-        uint8_t sendByte[14];
-        sendByte[0] = 0x00;
-        sendByte[1] = hostmsg->HleftID;
-        sendByte[2] = (hostmsg->Hleftspeed >> 8) & 0xFF;
-        sendByte[3] = hostmsg->Hleftspeed & 0xFF;
-        sendByte[4] = hostmsg->HrightID;
-        sendByte[5] = (hostmsg->Hrightspeed >> 8) & 0xFF;
-        sendByte[6] = hostmsg->Hrightspeed & 0xFF;
-        sendByte[7] = hostmsg->LleftID;
-        sendByte[8] = (hostmsg->Lleftspeed >> 8) & 0xFF;
-        sendByte[9] = (hostmsg->Lleftspeed & 0xFF);
-        sendByte[10] = hostmsg->LrightID;
-        sendByte[11] = (hostmsg->Lrightspeed >> 8) & 0xFF;
-        sendByte[12] = hostmsg->Lrightspeed & 0xFF;
-        sendByte[13] = getcrc(sendByte, 13);
-        ser.write(sendByte, sizeof(sendByte));
+    if (!ser.isOpen()) {
+        cout << "serial port is not opened" << endl;
+        return;
     }
+
+    // === Minimal addition: ensure IDs are correct ===
+    hostmsg->hm[0].ID = 0x01;
+    hostmsg->hm[1].ID = 0x02;
+    hostmsg->hm[2].ID = 0x03;
+    hostmsg->hm[3].ID = 0x04;
+    hostmsg->hm[4].ID = 0x05;
+    hostmsg->hm[5].ID = 0x06;
+
+    uint8_t sendByte[20];
+    sendByte[0] = 0x00;
+    sendByte[1] = hostmsg->hm[0].ID;
+    sendByte[2] = (hostmsg->hm[0].speed >> 8) & 0xFF;
+    sendByte[3] = hostmsg->hm[0].speed & 0xFF;
+    sendByte[4] = hostmsg->hm[1].ID;
+    sendByte[5] = (hostmsg->hm[1].speed >> 8) & 0xFF;
+    sendByte[6] = hostmsg->hm[1].speed & 0xFF;
+    sendByte[7] = hostmsg->hm[2].ID;
+    sendByte[8] = (hostmsg->hm[2].speed >> 8) & 0xFF;
+    sendByte[9] = hostmsg->hm[2].speed & 0xFF;
+    sendByte[10] = hostmsg->hm[3].ID;
+    sendByte[11] = (hostmsg->hm[3].speed >> 8) & 0xFF;
+    sendByte[12] = hostmsg->hm[3].speed & 0xFF;
+    sendByte[13] = hostmsg->hm[4].ID;
+    sendByte[14] = (hostmsg->hm[4].speed >> 8) & 0xFF;
+    sendByte[15] = hostmsg->hm[4].speed & 0xFF;
+    sendByte[16] = hostmsg->hm[5].ID;
+    sendByte[17] = (hostmsg->hm[5].speed >> 8) & 0xFF;
+    sendByte[18] = hostmsg->hm[5].speed & 0xFF;
+    sendByte[19] = getcrc(sendByte, 19);
+    ser.write(sendByte, sizeof(sendByte));
+}
 
 private:
     string port;
@@ -229,20 +244,29 @@ void cmd_handle(const geometry_msgs::Twist& cmd_vel) {
     angular_speed_req = cmd_vel.angular.z;
     speed_req_left = speed_req - (angular_speed_req * (fakeTrack / 2));
     speed_req_right = speed_req + (angular_speed_req * (fakeTrack / 2));
-    l_rpm = trunc((speed_req_left / (M_PI * fakewheelDia)) * 60);
-    r_rpm = trunc((speed_req_right / (M_PI * fakewheelDia)) * 60);
+    l_rpm = (int)trunc((speed_req_left / (M_PI * fakewheelDia)) * 60);
+    r_rpm = (int)trunc((speed_req_right / (M_PI * fakewheelDia)) * 60);
 }
-
+ 
 // Odometry calculation and publishing
 void handle_speed(const recvMessage& recv, tf::TransformBroadcaster& broadcaster, ros::Publisher& odom_pub, double loop_time) {
-    speed_act_upper_left = recv.Lrightspeed; // Corresponds to TopLeftWheel
-    speed_act_upper_right = recv.Lleftspeed; // Corresponds to TopRightWheel
-    speed_act_lower_left = recv.Hrightspeed; // Corresponds to BottomLeftWheel
-    speed_act_lower_right = recv.Hleftspeed; // Corresponds to BottomRightWheel
+    speed_id_1 = recv.rm[0].speed; // Corresponds to TopLeftWheel
+    speed_id_2 = recv.rm[1].speed; // Corresponds to TopRightWheel
+    speed_id_3 = recv.rm[2].speed; // Corresponds to BottomLeftWheel
+    speed_id_4 = recv.rm[3].speed; // Corresponds to BottomRightWheel
+    speed_id_5 = recv.rm[4].speed;
+    speed_id_6 = recv.rm[5].speed;
+
+    // ==================== ADD THIS LINE ====================
+    ROS_INFO("Received Motor Vel (RPM): %d %d %d %d %d %d", 
+             (int)speed_id_1, (int)speed_id_2, (int)speed_id_3, 
+             (int)speed_id_4, (int)speed_id_5, (int)speed_id_6);
+    // =======================================================
+
     speed_dt = loop_time / 1000; // Convert ms to s
     speed_time = ros::Time::now();
-    speed_act_left = (speed_act_upper_left + speed_act_lower_left) * wheel_cir / 2;
-    speed_act_right = -1 * (speed_act_upper_right + speed_act_lower_right) * wheel_cir / 2;
+    speed_act_left = (speed_id_1 + speed_id_3 + speed_id_5) * wheel_cir / 2;
+    speed_act_right = -1 * (speed_id_2 + speed_id_4 + speed_id_6) * wheel_cir / 2;
     ROS_INFO("speed_act_left: %f, speed_act_right: %f", speed_act_left, speed_act_right);
     // Odometry calculations
     double dt = speed_dt;
@@ -366,12 +390,13 @@ int main(int argc, char** argv) {
     std::string data, result;
     ros::Rate loop_rate(100);
     ros::Time last_publish_time = ros::Time::now();
-
+    
     while (ros::ok()) {
-        uint8_t bufferArray[42];
+        uint8_t bufferArray[48];
+        // memset(bufferArray, 0, sizeof(bufferArray));
         serial.notopen(result);
-        if (result.length() == 42) {
-            for (int i = 0; i < 42; i++) {
+        if (result.length() == 48) {
+            for (int i = 0; i < 48; i++) {
                 bufferArray[i] = result[i];
             }
         }
@@ -381,12 +406,15 @@ int main(int argc, char** argv) {
             last_publish_time = ros::Time::now();
         }
 
-        hostmsg.Hleftspeed = l_rpm;
-        hostmsg.Lleftspeed = l_rpm;
-        hostmsg.Hrightspeed = -r_rpm;
-        hostmsg.Lrightspeed = -r_rpm;
+        hostmsg.hm[0].speed = l_rpm;
+        hostmsg.hm[2].speed = l_rpm;
+        hostmsg.hm[4].speed = l_rpm;
+        hostmsg.hm[1].speed = -r_rpm;
+        hostmsg.hm[3].speed = -r_rpm;
+        hostmsg.hm[5].speed = -r_rpm;
+        // ROS_INFO("l_rpm: %.0f  r_rpm: %.0f", l_rpm, r_rpm);
         serial.putSpeed(&hostmsg);
-        if (checksum(bufferArray, 42)) {
+        if (checksum(bufferArray, 48)) {
             serial.readSpeed(&recv, bufferArray);
             handle_speed(recv, broadcaster, serial.odom_pub, LOOPTIME);
         }
